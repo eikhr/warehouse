@@ -29,7 +29,7 @@ public class RegisterView implements View {
         Button register = Styles.primary("Registrer");
         register.setPrefWidth(320);
         Hyperlink toLogin = new Hyperlink("Tilbake til innlogging");
-        toLogin.setStyle("-fx-text-fill: " + Styles.PURPLE + ";");
+        toLogin.setTextFill(Styles.PURPLE);
         Label error = Styles.error("");
 
         register.setOnAction(e -> {

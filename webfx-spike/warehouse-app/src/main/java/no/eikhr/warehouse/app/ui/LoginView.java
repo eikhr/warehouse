@@ -26,7 +26,7 @@ public class LoginView implements View {
         Button login = Styles.primary("Logg inn");
         login.setPrefWidth(320);
         Hyperlink toRegister = new Hyperlink("Opprett bruker");
-        toRegister.setStyle("-fx-text-fill: " + Styles.PURPLE + ";");
+        toRegister.setTextFill(Styles.PURPLE);
         Label error = Styles.error("");
 
         login.setOnAction(e -> {

@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 
 /** Root container: a persistent purple title bar on top; the center swaps per view. */
 public class AppShell {
@@ -13,9 +14,9 @@ public class AppShell {
         HBox titleBar = new HBox(Styles.title("Warehouse"));
         titleBar.setAlignment(Pos.CENTER_LEFT);
         titleBar.setPadding(new Insets(12, 20, 12, 20));
-        titleBar.setStyle("-fx-background-color: " + Styles.PURPLE + ";");
+        Styles.bg(titleBar, Styles.PURPLE, 0);
         root.setTop(titleBar);
-        root.setStyle("-fx-background-color: white;");
+        Styles.bg(root, Color.WHITE, 0);
     }
 
     public BorderPane getRoot() { return root; }

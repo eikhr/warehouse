@@ -136,7 +136,7 @@ public class ItemDetailView implements View {
         centerWrap.setAlignment(Pos.TOP_CENTER);
         ScrollPane scroll = new ScrollPane(centerWrap);
         scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: " + Styles.SCROLL_BG + ";");
+        Styles.bg(scroll, Styles.SCROLL_BG, 0);
         root.getChildren().add(scroll);
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
     }

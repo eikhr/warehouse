@@ -48,7 +48,7 @@ public class ItemListView implements View {
         String who = session.username();
         Label user = new Label(who != null ? "Logget inn som " + who : "Ikke innlogget");
         user.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 13));
-        user.setStyle("-fx-text-fill: " + Styles.PURPLE + ";");
+        user.setTextFill(Styles.PURPLE);
         Button logout = Styles.secondary("Logg ut");
         logout.setOnAction(e -> { session.setAuth(null); shell.show(new LoginView(session, shell)); });
         Region s1 = new Region(); HBox.setHgrow(s1, Priority.ALWAYS);
@@ -78,7 +78,7 @@ public class ItemListView implements View {
         Region s2 = new Region(); HBox.setHgrow(s2, Priority.ALWAYS);
         HBox sortBar = new HBox(10, sortLabel, byName, byAmount, byBrand, s2, status);
         sortBar.setAlignment(Pos.CENTER_LEFT);
-        status.setStyle("-fx-text-fill: " + Styles.TEXT_DARK + ";");
+        status.setTextFill(Styles.TEXT_DARK);
 
         VBox header = new VBox(12, userBar, actions, sortBar);
         header.setPadding(new Insets(16, 18, 12, 18));
@@ -86,7 +86,7 @@ public class ItemListView implements View {
         rows.setPadding(new Insets(6, 18, 18, 18));
         ScrollPane scroll = new ScrollPane(rows);
         scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: " + Styles.SCROLL_BG + ";");
+        Styles.bg(scroll, Styles.SCROLL_BG, 0);
 
         root.setTop(header);
         root.setCenter(scroll);
@@ -142,8 +142,8 @@ public class ItemListView implements View {
             row.setPadding(new Insets(10, 14, 10, 14));
             row.setCursor(Cursor.HAND);
             boolean odd = (idx++ % 2) == 1;
-            row.setStyle("-fx-background-color: " + (odd ? Styles.ROW_DARK : Styles.ROW_LIGHT) + ";"
-                + " -fx-text-fill: " + Styles.TEXT_DARK + "; -fx-background-radius: 8px;");
+            Styles.bg(row, odd ? Styles.ROW_DARK : Styles.ROW_LIGHT, 8);
+            row.setTextFill(Styles.TEXT_DARK);
             row.setOnAction(e -> shell.show(new ItemDetailView(session, shell, it)));
             rows.getChildren().add(row);
         }

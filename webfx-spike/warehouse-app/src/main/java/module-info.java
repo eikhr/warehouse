@@ -3,7 +3,10 @@
 module warehouse.app {
 
     // Direct dependencies modules
+    requires javafx.controls;
     requires javafx.graphics;
+    requires webfx.platform.ast;
+    requires webfx.platform.fetch.ast.json;
 
     // Exported packages
     exports no.eikhr.warehouse.app;

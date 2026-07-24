@@ -225,3 +225,204 @@ fx-svgpath svg path:not([stroke-linecap]) {
 fx-svgpath svg path:not([stroke-linejoin]) {
     stroke-linejoin: var(--fx-svg-path-stroke-linejoin, var(--fx-stroke-linejoin));
 }
+/*===== webfx-kit-javafxcontrols-web@main.css from webfx-kit-javafxcontrols-peers-elemental2 =====*/
+
+/***** Global variables *****/
+:root {
+    --fx-tabheaderarea-background-color: #D3D3D3;
+    --fx-tabheaderarea-border-radius: 0;
+    --fx-tabheaderarea-padding-top: 5px;
+    --fx-tabheaderarea-padding-bottom: 0;
+    --fx-tabheaderarea-padding-left: 10px;
+    --fx-tabheaderarea-padding-right: 0;
+    --fx-tabheader-background-color: #e5e5e5;
+    --fx-tabheader-background-color-selected: #f5f5f5;
+    --fx-tabheader-border-radius: 5px 5px 0 0;
+    --fx-tabheader-border-style: solid;
+    --fx-tabheader-border-color: darkgray;
+    --fx-tabheader-border-width: 1px;
+    --fx-tabheader-border-width-selected: 1px 1px 0 1px;
+    --fx-tabheader-padding-top: 3px;
+    --fx-tabheader-padding-bottom: 3px;
+    --fx-tabheader-padding-left: 10px;
+    --fx-tabheader-padding-right: 10px;
+    --fx-tabheader-text-fill: var(--fx-text-fill);
+    --fx-tabheader-text-fill-selected: var(--fx-text-fill);
+
+    --fx-theme-color: #0095cb;
+    --fx-placholder-color: #888;
+    --fx-progress-indicator-color: var(--fx-theme-color);
+    --fx-hyperlink-text-fill: var(--fx-theme-color);
+    --fx-checkbox-background-color: var(--fx-theme-color);
+    --fx-checkbox-border-color: var(--fx-text-fill);
+    --fx-radiobutton-background-color: var(--fx-theme-color);
+    --fx-radiobutton-border-color: var(--fx-text-fill);
+}
+
+::placeholder {
+    color: var(--fx-placholder-color);
+}
+
+/* Without this rule, the context menu is wrongly shifted up by the browser the first time it is displayed */
+fx-scene > * {
+    overflow: hidden;
+}
+
+/* Applying text color to svg path as well by default */
+fx-label, fx-button, fx-togglebutton {
+    --fx-svg-path-fill: var(--fx-text-fill);
+}
+
+fx-hyperlink {
+    --fx-text-fill: var(--fx-hyperlink-text-fill);
+}
+
+fx-hyperlink fx-text:hover {
+    text-decoration: underline;
+}
+
+/* Removing borders, outlines and background for input elements (to not interfere with the text field below) */
+input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+/* Removing spinner buttons on number inputs. Reasons: 1) Not in JavaFX 2) Make the text field narrower which can cause
+ unwanted clip on the number, ex: on FireFox when app code call setPrefWith(80) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+/* and for FireFox: */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+fx-button, fx-togglebutton {
+    --fx-background-color: white;
+    --fx-border-style: solid;
+    --fx-border-color: #c0c0c0;
+    --fx-border-width: 1px;
+    --fx-border-radius: 5px;
+    --text-user-select: none;
+}
+
+.text-field {
+    --fx-background-color: white;
+    --fx-border-style: solid;
+    --fx-border-color: #c0c0c0;
+    --fx-border-width: 1px;
+    --fx-border-radius: 5px;
+}
+
+textarea {
+    padding: 8px;
+    box-sizing: border-box;
+    outline: none;
+
+    /* textarea has fx-no-border-overlay instead of fx-border-overlay (because :before for borders doesn't work on textarea), so we apply the border styles directly to it */
+    border-style: var(--fx-border-style);
+    border-color: var(--fx-border-color);
+    border-width: var(--fx-border-width);
+    border-radius: var(--fx-border-radius, inherit);
+}
+
+textarea:focus {
+    --fx-border-color: var(--fx-focus-color);
+}
+
+fx-titledpane textarea {
+    --fx-border-radius: 0 0 5px 5px;
+}
+
+/* Cross for the tab close button */
+.tab-close-button {
+    --fx-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23444' stroke-width='2' stroke-linejoin='round' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M 4,4 L 12,12 Z M 4,12 L 12,4 Z\'/%3E%3C/svg%3E");
+}
+
+fx-menuitemcontainer:focus {
+    --fx-background-color: var(--fx-focus-color);
+    --fx-text-fill: white;
+}
+
+/* Ellipsis management for wrapped text inside a label with restricted height */
+
+fx-label.ellipsis {
+    overflow: hidden;
+}
+
+fx-label.ellipsis fx-text {
+    /*text-overflow: ellipsis;*/
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    /* -webkit-line-clamp will be set in JS by HtmlTextPeer */
+}
+
+fx-progressindicator .spinner .segment {
+    background-color: var(--fx-progress-indicator-color);
+}
+
+fx-checkbox .box .mark {
+    --fx-border-style: solid;
+    --fx-border-color: var(--fx-checkbox-border-color);
+    --fx-border-width: 1px;
+    --fx-border-radius: 3px;
+}
+
+fx-checkbox.pseudo-selected .box .mark {
+    --fx-background-radius: 3px;
+    --fx-background-color: var(--fx-checkbox-background-color);
+}
+
+fx-radiobutton .radio .dot {
+    --fx-border-style: solid;
+    --fx-border-color: var(--fx-radiobutton-border-color);
+    --fx-border-width: 1px;
+    --fx-border-radius: 50%;
+}
+
+fx-radiobutton.pseudo-selected .radio .dot {
+    --fx-background-radius: 50%;
+    --fx-background-color: var(--fx-radiobutton-background-color);
+}
+
+fx-tabheaderarea {
+    --fx-background-color: var(--fx-tabheaderarea-background-color);
+    --fx-border-radius: var(--fx-tabheaderarea-border-radius);
+}
+
+/* Web padding that is read back by WebFX to JavaFX padding */
+fx-tabheaderarea {
+    --fx-padding-top: var(--fx-tabheaderarea-padding-top);
+    --fx-padding-right: var(--fx-tabheaderarea-padding-right);
+    --fx-padding-bottom: var(--fx-tabheaderarea-padding-bottom);
+    --fx-padding-left: var(--fx-tabheaderarea-padding-left);
+}
+
+
+fx-tabheaderskin {
+    --fx-background-color: var(--fx-tabheader-background-color);
+    --fx-border-radius: var(--fx-tabheader-border-radius);
+    --fx-border-style: var(--fx-tabheader-border-style);
+    --fx-border-color: var(--fx-tabheader-border-color);
+    --fx-border-width: var(--fx-tabheader-border-width);
+    --fx-text-fill: var(--fx-tabheader-text-fill);
+    cursor: pointer;
+}
+
+fx-tabheaderskin.selected {
+    --fx-tabheader-background-color: var(--fx-tabheader-background-color-selected);
+    --fx-tabheader-border-width: var(--fx-tabheader-border-width-selected);
+    --fx-text-fill: var(--fx-tabheader-text-fill-selected);
+}
+
+/* Web padding that is read back by WebFX to JavaFX padding */
+fx-tabheaderskin {
+    --fx-padding-top: var(--fx-tabheader-padding-top);
+    --fx-padding-right: var(--fx-tabheader-padding-right);
+    --fx-padding-bottom: var(--fx-tabheader-padding-bottom);
+    --fx-padding-left: var(--fx-tabheader-padding-left);
+}

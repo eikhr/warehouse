@@ -28,7 +28,7 @@ public class ServerSelectView implements View {
                 return;
             }
             session.setBaseUrl(u);
-            shell.show(new LoginView(session, shell));
+            shell.showList();
         });
 
         VBox card = new VBox(14, Styles.heading("Koble til server"),

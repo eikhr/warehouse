@@ -20,27 +20,29 @@ import javafx.scene.text.FontWeight;
 /**
  * Central brand styling for the warehouse app.
  *
- * <p><b>WebFX styling note (the reusable bit):</b> webfx-kit has <em>no</em>
- * JavaFX CSS engine. There is no {@code CssParser}/{@code StyleManager}, so a
- * node's {@code setStyle("-fx-...")} string is <b>inert</b> — nothing parses it
- * into node properties (verified in the live DOM: no {@code --fx-*} vars appear,
- * every background computes to white). {@code Scene.getStylesheets()} and style
- * classes are inert too. What renders is the scene-graph <b>property API</b>: the
- * HTML peers map {@code setBackground}, {@code setBorder}, {@code setTextFill},
- * {@code setFont}, {@code setPadding} and {@code setAlignment} onto the DOM
- * element. So every visual here is applied through those APIs — never a CSS
- * string. Buttons/TextFields/panes all extend {@link Region}, so
+ * <p><b>WebFX styling note:</b> webfx-kit has <em>no</em> JavaFX CSS engine, so a
+ * node's {@code setStyle("-fx-...")} string is <b>inert</b>. Everything here is
+ * applied through the scene-graph <b>property API</b> — {@code setBackground},
+ * {@code setBorder}, {@code setTextFill}, {@code setFont}, {@code setPadding},
+ * {@code setAlignment}, {@code setSpacing} — which the HTML peers map to the DOM.
+ * Buttons/TextFields/panes all extend {@link Region}, so
  * {@code setBackground}/{@code setBorder} work on them.
  */
 final class Styles {
     static final Color PURPLE        = Color.web("#840b9b");
+    static final Color PURPLE_DARK   = Color.web("#5f0a70");
     static final Color DELETE_RED    = Color.web("#db1818");
     static final Color PANEL         = Color.web("#f1f1f1");
-    static final Color ROW_LIGHT     = Color.web("#efefef");
-    static final Color ROW_DARK      = Color.web("#e4e4e4");
+    static final Color ROW_A         = Color.web("#f4f4f4");
+    static final Color ROW_B         = Color.WHITE;
+    static final Color HEADER_GREY   = Color.web("#dcdcdc");
     static final Color SCROLL_BG     = Color.web("#f9f9f9");
     static final Color TEXT_DARK     = Color.web("#333333");
+    static final Color NAME_DARK     = Color.web("#222222");
+    static final Color GREY_TEXT     = Color.web("#555555");
+    static final Color CAPTION_GREY  = Color.web("#777777");
     static final Color BORDER_GREY   = Color.web("#cccccc");
+    static final Color STEP_GREY     = Color.web("#e0e0e0");
     static final Color BTN_SECONDARY = Color.rgb(0, 0, 0, 0.06);
 
     private Styles() {}
@@ -56,32 +58,19 @@ final class Styles {
             new CornerRadii(radius), new BorderWidths(w))));
     }
 
-    static Label title(String text) {
+    static Label label(String text, double size, FontWeight weight, Color fill) {
         Label l = new Label(text);
-        l.setFont(Font.font("System", FontWeight.BOLD, 20));
-        l.setTextFill(Color.WHITE);
+        l.setFont(Font.font("System", weight, size));
+        l.setTextFill(fill);
         return l;
     }
 
-    static Label heading(String text) {
-        Label l = new Label(text);
-        l.setFont(Font.font("System", FontWeight.BOLD, 22));
-        l.setTextFill(PURPLE);
-        return l;
-    }
-
-    static Label fieldLabel(String text) {
-        Label l = new Label(text);
-        l.setFont(Font.font("System", FontWeight.BOLD, 13));
-        l.setTextFill(TEXT_DARK);
-        return l;
-    }
-
-    static Label error(String text) {
-        Label l = new Label(text);
-        l.setTextFill(DELETE_RED);
-        return l;
-    }
+    static Label title(String text) { return label(text, 24, FontWeight.BOLD, Color.WHITE); }
+    static Label heading(String text) { return label(text, 22, FontWeight.BOLD, PURPLE); }
+    static Label sectionHeading(String text) { return label(text, 15, FontWeight.BOLD, NAME_DARK); }
+    static Label fieldLabel(String text) { return label(text, 13, FontWeight.BOLD, TEXT_DARK); }
+    static Label caption(String text) { return label(text, 11, FontWeight.NORMAL, CAPTION_GREY); }
+    static Label error(String text) { return label(text, 13, FontWeight.NORMAL, DELETE_RED); }
 
     static Button primary(String text) {
         Button b = base(text);
@@ -113,6 +102,29 @@ final class Styles {
         return b;
     }
 
+    /** White, bordered, rounded button used as a menu-button ("Sorter ▾") — no ComboBox in WebFX. */
+    static Button menuButton(String text) {
+        Button b = base(text);
+        b.setFont(Font.font("System", FontWeight.NORMAL, 13));
+        bg(b, Color.WHITE, 8);
+        border(b, BORDER_GREY, 1, 8);
+        b.setTextFill(TEXT_DARK);
+        return b;
+    }
+
+    /** Round grey button for the −/+ stepper. */
+    static Button round(String text) {
+        Button b = new Button(text);
+        b.setFont(Font.font("System", FontWeight.BOLD, 18));
+        b.setMinSize(36, 36);
+        b.setPrefSize(36, 36);
+        b.setMaxSize(36, 36);
+        b.setCursor(Cursor.HAND);
+        bg(b, STEP_GREY, 18);
+        b.setTextFill(NAME_DARK);
+        return b;
+    }
+
     private static Button base(String text) {
         Button b = new Button(text);
         b.setFont(Font.font("System", FontWeight.BOLD, 13));
@@ -128,9 +140,16 @@ final class Styles {
         return tf;
     }
 
-    /** Light rounded panel background (the inputGroup look). */
+    /** Light rounded grey panel (section background / inputGroup look). */
     static void panel(Region r) {
         r.setPadding(new Insets(16));
         bg(r, PANEL, 10);
+    }
+
+    /** White rounded bordered card (modal / location boxes). */
+    static void whiteCard(Region r, double pad, double radius) {
+        r.setPadding(new Insets(pad));
+        bg(r, Color.WHITE, radius);
+        border(r, BORDER_GREY, 1, radius);
     }
 }

@@ -125,7 +125,14 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
-                                    <skip>true</skip>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>no.eikhr</groupId>
+                                            <artifactId>warehouse-app</artifactId>
+                                            <version>1.0.0-SNAPSHOT</version>
+                                            <includes>no/eikhr/warehouse/app/icons/</includes>
+                                        </artifactItem>
+                                    </artifactItems>
                                     <excludes>**/*.java,**/*.class</excludes>
                                     <outputDirectory>${project.build.directory}/teavm</outputDirectory>
                                 </configuration>

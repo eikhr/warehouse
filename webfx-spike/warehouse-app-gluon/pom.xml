@@ -98,6 +98,7 @@
                     </attachList>
                     <resourcesList>
                         <list>dev/webfx/platform/meta/exe/[^/]+$</list>
+                        <list>no/eikhr/warehouse/app/icons/[^/]+$</list>
                     </resourcesList>
                 </configuration>
             </plugin>

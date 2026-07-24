@@ -64,9 +64,17 @@ public class ItemListView implements View {
 
     // --- toolbar ---
     private Node buildToolbar() {
-        search.setPromptText("🔍  Søk…");
-        search.setPrefWidth(320);
+        search.setPromptText("Søk…");
+        search.setPrefWidth(300);
         search.textProperty().addListener((obs, o, n) -> render());
+
+        Styles.bg(search, javafx.scene.paint.Color.TRANSPARENT, 0);
+        Styles.border(search, javafx.scene.paint.Color.TRANSPARENT, 0, 0);
+        HBox searchBox = new HBox(6, Styles.icon("search.png", 14), search);
+        searchBox.setAlignment(Pos.CENTER_LEFT);
+        searchBox.setPadding(new Insets(0, 10, 0, 10));
+        Styles.bg(searchBox, javafx.scene.paint.Color.WHITE, 6);
+        Styles.border(searchBox, Styles.BORDER_GREY, 1, 6);
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().addAll(
@@ -78,7 +86,7 @@ public class ItemListView implements View {
         dirBtn.setMinWidth(40);
         dirBtn.setOnAction(e -> { ascending = !ascending; dirBtn.setText(ascending ? "▲" : "▼"); render(); });
 
-        HBox bar = new HBox(10, search, sortBtn, dirBtn);
+        HBox bar = new HBox(10, searchBox, sortBtn, dirBtn);
         bar.setAlignment(Pos.CENTER_LEFT);
 
         if (session.isLoggedIn()) {

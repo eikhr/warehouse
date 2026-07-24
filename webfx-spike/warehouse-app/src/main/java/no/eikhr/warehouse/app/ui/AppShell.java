@@ -72,9 +72,7 @@ public class AppShell {
 
     // --- title bar ---
     private void rebuildTitleBar() {
-        Label glyph = Styles.label("🏭", 24, FontWeight.NORMAL, Color.WHITE); // 🏭
-        Label title = Styles.title("Warehouse");
-        HBox left = new HBox(10, glyph, title);
+        HBox left = new HBox(Styles.icon("logo-white.png", 40));
         left.setAlignment(Pos.CENTER_LEFT);
 
         Region spacer = new Region();
@@ -83,9 +81,9 @@ public class AppShell {
         HBox right = new HBox(10);
         right.setAlignment(Pos.CENTER_RIGHT);
         if (session.isLoggedIn()) {
-            right.getChildren().addAll(pill("👤  " + session.username()), logoutButton());
+            right.getChildren().addAll(pill("user-edit-white.png", session.username()), logoutButton());
         } else {
-            right.getChildren().addAll(pill("👤🔒"), loginButton());
+            right.getChildren().addAll(pill("user-lock-white.png", null), loginButton());
         }
 
         HBox bar = new HBox(left, spacer, right);
@@ -97,11 +95,14 @@ public class AppShell {
         frame.setTop(bar);
     }
 
-    private Label pill(String text) {
-        Label l = Styles.label(text, 13, FontWeight.BOLD, Color.WHITE);
-        l.setPadding(new Insets(5, 12, 5, 12));
-        Styles.bg(l, Styles.PURPLE_DARK, 14);
-        return l;
+    private HBox pill(String iconFile, String text) {
+        HBox h = new HBox(6, Styles.icon(iconFile, 16));
+        if (text != null && !text.isEmpty())
+            h.getChildren().add(Styles.label(text, 13, FontWeight.BOLD, Color.WHITE));
+        h.setAlignment(Pos.CENTER);
+        h.setPadding(new Insets(5, 12, 5, 12));
+        Styles.bg(h, Styles.PURPLE_DARK, 14);
+        return h;
     }
 
     private Button loginButton() {

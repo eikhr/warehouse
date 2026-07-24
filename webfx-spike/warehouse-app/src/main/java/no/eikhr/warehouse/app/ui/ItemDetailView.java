@@ -52,8 +52,8 @@ public class ItemDetailView implements View {
     private final TextField barcodeField = new TextField();
     private final Canvas barcodeCanvas = new Canvas(250, 80);
 
-    private final Button minusBtn = Styles.round("−");
-    private final Button plusBtn = Styles.round("+");
+    private final Button minusBtn = Styles.iconButton("minus-circle.png", 24);
+    private final Button plusBtn = Styles.iconButton("plus-circle.png", 24);
     private final VBox actionArea = new VBox(10);
     private final Label error = Styles.error("");
 
@@ -120,9 +120,9 @@ public class ItemDetailView implements View {
 
     // ---- sections ----
     private Node productInfoSection() {
-        HBox row = new HBox(16, hgrow(fieldGroup("Produktnavn", nameField)),
-                                hgrow(fieldGroup("Produsent", brandField)));
-        return section("🎁  Produktinfo", row);
+        HBox row = new HBox(16, hgrow(fieldGroup("Produktnavn", "tag.png", nameField)),
+                                hgrow(fieldGroup("Produsent", "industry-alt.png", brandField)));
+        return section("box-full.png", "Produktinfo", row);
     }
 
     private Node stockSection() {
@@ -143,7 +143,7 @@ public class ItemDetailView implements View {
                                   hgrow(locationBox("Hylle", shelfField)));
         VBox placement = new VBox(6, Styles.fieldLabel("Plassering på lager"), boxes);
 
-        return section("📦  Lagerbeholdning", new VBox(16, amountBlock, placement));
+        return section("inventory.png", "Lagerbeholdning", new VBox(16, amountBlock, placement));
     }
 
     private Node priceSection() {
@@ -151,7 +151,7 @@ public class ItemDetailView implements View {
             hgrow(fieldGroupCap("Ordinær", regularField, "ink.mva")),
             hgrow(fieldGroupCap("Utsalg", saleField, "ink.mva")),
             hgrow(fieldGroupCap("Innkjøp", purchaseField, "eks.mva")));
-        return section("💰  Prisdata", row);
+        return section("coins.png", "Prisdata", row);
     }
 
     private Node dimensionSection() {
@@ -160,7 +160,7 @@ public class ItemDetailView implements View {
             hgrow(fieldGroupCap("Bredde", widthField, "cm")),
             hgrow(fieldGroupCap("Høyde", heightField, "cm")),
             hgrow(fieldGroupCap("Vekt", weightField, "kg")));
-        return section("📐  Dimensjoner", row);
+        return section("box.png", "Dimensjoner", row);
     }
 
     private Node barcodeSection() {
@@ -172,11 +172,14 @@ public class ItemDetailView implements View {
         Styles.whiteCard(canvasWrap, 6, 6);
         HBox row = new HBox(16, left, canvasWrap);
         row.setAlignment(Pos.CENTER_LEFT);
-        return section("🏷️  Barcode (13 sifre)", row);
+        return section("scanner.png", "Barcode (13 sifre)", row);
     }
 
-    private Node section(String heading, Node body) {
-        VBox v = new VBox(12, Styles.sectionHeading(heading), body);
+    private Node section(String iconFile, String heading, Node body) {
+        Label h = Styles.sectionHeading(heading);
+        h.setGraphic(Styles.icon(iconFile, 16));
+        h.setGraphicTextGap(8);
+        VBox v = new VBox(12, h, body);
         Styles.panel(v);
         return v;
     }
@@ -186,6 +189,15 @@ public class ItemDetailView implements View {
         Styles.input(field);
         field.setMaxWidth(Double.MAX_VALUE);
         return new VBox(4, Styles.fieldLabel(label), field);
+    }
+
+    private static VBox fieldGroup(String label, String iconFile, TextField field) {
+        Styles.input(field);
+        field.setMaxWidth(Double.MAX_VALUE);
+        Label l = Styles.fieldLabel(label);
+        l.setGraphic(Styles.icon(iconFile, 12));
+        l.setGraphicTextGap(6);
+        return new VBox(4, l, field);
     }
 
     private static VBox fieldGroupCap(String label, TextField field, String cap) {
@@ -227,17 +239,23 @@ public class ItemDetailView implements View {
     private void renderActions() {
         actionArea.getChildren().clear();
         if (editing) {
-            Button save = Styles.primary("💾  LAGRE");
+            Button save = Styles.primary("LAGRE");
+            save.setGraphic(Styles.icon("save.png", 14));
+            save.setGraphicTextGap(8);
             save.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(save, Priority.ALWAYS);
             save.setOnAction(e -> doSave(save));
-            Button del = Styles.danger("🗑  SLETT");
+            Button del = Styles.danger("SLETT");
+            del.setGraphic(Styles.icon("trash-alt.png", 14));
+            del.setGraphicTextGap(8);
             del.setDisable(item.getId() == null);
             del.setOnAction(e -> doDelete(del));
             HBox row = new HBox(10, save, del);
             actionArea.getChildren().add(row);
         } else {
-            Button edit = Styles.primary("✏  Rediger");
+            Button edit = Styles.primary("Rediger");
+            edit.setGraphic(Styles.icon("edit.png", 18));
+            edit.setGraphicTextGap(8);
             edit.setMaxWidth(Double.MAX_VALUE);
             edit.setOnAction(e -> {
                 if (session.isLoggedIn()) setEditing(true);

@@ -5,6 +5,8 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -16,6 +18,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import dev.webfx.platform.resource.Resource;
 
 /**
  * Central brand styling for the warehouse app.
@@ -151,5 +154,30 @@ final class Styles {
         r.setPadding(new Insets(pad));
         bg(r, Color.WHITE, radius);
         border(r, BORDER_GREY, 1, radius);
+    }
+
+    // ---- icons (bundled PNG resources) ----
+    // WebFX image loading: the PNGs live in the shared module's resources under
+    // no/eikhr/warehouse/app/icons/. `webfx update` auto-detects that resource
+    // package and emits <public> copy entries in module.gwt.xml, so the files are
+    // copied beside index.html in the GWT output. Resource.toUrl(path, class) with
+    // a leading '/' returns the path relative to index.html; new Image(url) then
+    // loads it and the HtmlImageViewPeer renders an <img>.
+    static ImageView icon(String file, double size) {
+        String url = Resource.toUrl("/no/eikhr/warehouse/app/icons/" + file, Styles.class);
+        ImageView iv = new ImageView(new Image(url));
+        iv.setFitHeight(size);
+        iv.setPreserveRatio(true);
+        return iv;
+    }
+
+    /** A borderless, transparent button whose only content is an icon graphic. */
+    static Button iconButton(String file, double size) {
+        Button b = new Button();
+        b.setGraphic(icon(file, size));
+        b.setCursor(Cursor.HAND);
+        b.setPadding(new Insets(2));
+        bg(b, Color.TRANSPARENT, 0);
+        return b;
     }
 }

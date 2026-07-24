@@ -3,77 +3,102 @@ package no.eikhr.warehouse.app.ui;
 import no.eikhr.warehouse.app.model.Item;
 import no.eikhr.warehouse.app.session.Session;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
  * Port of {@code Warehouse.fxml}/{@code WarehouseController}. Fetches items and
- * renders each as a clickable row. The FXML {@code ComboBox} sort selector is
- * replaced by a {@link ToggleGroup} of {@link RadioButton}s (WebFX-supported).
+ * renders each as a clickable styled row. The FXML {@code ComboBox} sort selector
+ * is replaced by a {@link ToggleGroup} of {@link RadioButton}s, and a search field
+ * filters the list (client-side).
  */
 public class ItemListView implements View {
     private final BorderPane root = new BorderPane();
-    private final VBox rows = new VBox(4);
+    private final VBox rows = new VBox(6);
     private final Label status = new Label();
+    private final TextField search = Styles.input(new TextField());
     private final Session session;
     private final AppShell shell;
-    private List<Item> items = Collections.emptyList();
+    private List<Item> allItems = Collections.emptyList();
     private Comparator<Item> currentSort = byName();
 
     public ItemListView(Session session, AppShell shell) {
         this.session = session;
         this.shell = shell;
 
-        ToggleGroup sort = new ToggleGroup();
-        RadioButton byName = new RadioButton("Name");   byName.setToggleGroup(sort); byName.setSelected(true);
-        RadioButton byAmount = new RadioButton("Amount"); byAmount.setToggleGroup(sort);
-        RadioButton byBrand = new RadioButton("Brand");  byBrand.setToggleGroup(sort);
-        byName.setOnAction(e -> { currentSort = byName(); render(); });
-        byAmount.setOnAction(e -> { currentSort = Comparator.comparingInt(Item::getAmount); render(); });
-        byBrand.setOnAction(e -> { currentSort = byBrand(); render(); });
-
-        Button add = new Button("Add item");
-        add.setOnAction(e -> shell.show(new ItemDetailView(session, shell, new Item())));
-
-        Button refresh = new Button("Refresh");
-        refresh.setOnAction(e -> load());
-
+        // --- user bar ---
         String who = session.username();
-        Label user = new Label(who != null ? "Signed in as " + who : "Not signed in");
-        Hyperlink logout = new Hyperlink("Log out");
+        Label user = new Label(who != null ? "Logget inn som " + who : "Ikke innlogget");
+        user.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 13));
+        user.setStyle("-fx-text-fill: " + Styles.PURPLE + ";");
+        Button logout = Styles.secondary("Logg ut");
         logout.setOnAction(e -> { session.setAuth(null); shell.show(new LoginView(session, shell)); });
+        Region s1 = new Region(); HBox.setHgrow(s1, Priority.ALWAYS);
+        HBox userBar = new HBox(10, user, s1, logout);
+        userBar.setAlignment(Pos.CENTER_LEFT);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox userBar = new HBox(10, user, spacer, logout);
-        userBar.setPadding(new Insets(10, 10, 0, 10));
+        // --- search + actions ---
+        search.setPromptText("Søk...");
+        HBox.setHgrow(search, Priority.ALWAYS);
+        search.textProperty().addListener((obs, o, n) -> applyView());
+        Button add = Styles.primary("Legg til produkt");
+        add.setOnAction(e -> shell.show(new ItemDetailView(session, shell, new Item())));
+        Button refresh = Styles.secondary("Oppdater");
+        refresh.setOnAction(e -> load());
+        HBox actions = new HBox(10, search, add, refresh);
+        actions.setAlignment(Pos.CENTER_LEFT);
 
-        HBox top = new HBox(10, new Label("Sort:"), byName, byAmount, byBrand, add, refresh);
-        top.setPadding(new Insets(10));
+        // --- sort ---
+        ToggleGroup sort = new ToggleGroup();
+        RadioButton byName = radio("Navn", sort); byName.setSelected(true);
+        RadioButton byAmount = radio("Antall", sort);
+        RadioButton byBrand = radio("Produsent", sort);
+        byName.setOnAction(e -> { currentSort = byName(); applyView(); });
+        byAmount.setOnAction(e -> { currentSort = Comparator.comparingInt(Item::getAmount); applyView(); });
+        byBrand.setOnAction(e -> { currentSort = byBrand(); applyView(); });
+        Label sortLabel = Styles.fieldLabel("Sorter:");
+        Region s2 = new Region(); HBox.setHgrow(s2, Priority.ALWAYS);
+        HBox sortBar = new HBox(10, sortLabel, byName, byAmount, byBrand, s2, status);
+        sortBar.setAlignment(Pos.CENTER_LEFT);
+        status.setStyle("-fx-text-fill: " + Styles.TEXT_DARK + ";");
 
-        rows.setPadding(new Insets(10));
+        VBox header = new VBox(12, userBar, actions, sortBar);
+        header.setPadding(new Insets(16, 18, 12, 18));
+
+        rows.setPadding(new Insets(6, 18, 18, 18));
         ScrollPane scroll = new ScrollPane(rows);
         scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: " + Styles.SCROLL_BG + ";");
 
-        root.setTop(new VBox(userBar, top, status));
+        root.setTop(header);
         root.setCenter(scroll);
-        status.setPadding(new Insets(0, 10, 6, 10));
 
         load();
+    }
+
+    private static RadioButton radio(String text, ToggleGroup g) {
+        RadioButton r = new RadioButton(text);
+        r.setToggleGroup(g);
+        r.setCursor(Cursor.HAND);
+        return r;
     }
 
     private static String nz(String s) { return s == null ? "" : s; }
@@ -81,24 +106,44 @@ public class ItemListView implements View {
     private static Comparator<Item> byBrand() { return Comparator.comparing((Item i) -> nz(i.getBrand()), String.CASE_INSENSITIVE_ORDER); }
 
     private void load() {
-        status.setText("Loading…");
+        status.setText("Laster…");
         rows.getChildren().clear();
         session.server().getItems()
-            .onFailure(err -> status.setText("Error: " + err.getMessage()))
-            .onSuccess(list -> {
-                items = list;
-                status.setText(list.size() + " items");
-                render();
-            });
+            .onFailure(err -> status.setText("Feil: " + err.getMessage()))
+            .onSuccess(list -> { allItems = list; applyView(); });
     }
 
-    private void render() {
-        items.sort(currentSort);
+    private void applyView() {
+        String q = search.getText() == null ? "" : search.getText().trim().toLowerCase();
+        List<Item> view = new ArrayList<>();
+        for (Item it : allItems) {
+            if (q.isEmpty()
+                || nz(it.getName()).toLowerCase().contains(q)
+                || nz(it.getBrand()).toLowerCase().contains(q)) {
+                view.add(it);
+            }
+        }
+        view.sort(currentSort);
+        status.setText(view.size() + " produkter");
+        render(view);
+    }
+
+    private void render(List<Item> view) {
         rows.getChildren().clear();
-        for (Item it : items) {
-            String label = nz(it.getName()) + "  —  qty " + it.getAmount()
-                + (nz(it.getBrand()).isEmpty() ? "" : "  (" + it.getBrand() + ")");
-            Hyperlink row = new Hyperlink(label);
+        int idx = 0;
+        for (Item it : view) {
+            String brand = nz(it.getBrand());
+            String text = nz(it.getName()) + "     ·     antall " + it.getAmount()
+                + (brand.isEmpty() ? "" : "     ·     " + brand);
+            Button row = new Button(text);
+            row.setFont(Font.font("System", 14));
+            row.setMaxWidth(Double.MAX_VALUE);
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setPadding(new Insets(10, 14, 10, 14));
+            row.setCursor(Cursor.HAND);
+            boolean odd = (idx++ % 2) == 1;
+            row.setStyle("-fx-background-color: " + (odd ? Styles.ROW_DARK : Styles.ROW_LIGHT) + ";"
+                + " -fx-text-fill: " + Styles.TEXT_DARK + "; -fx-background-radius: 8px;");
             row.setOnAction(e -> shell.show(new ItemDetailView(session, shell, it)));
             rows.getChildren().add(row);
         }

@@ -3,9 +3,11 @@ package no.eikhr.warehouse.app.ui;
 import no.eikhr.warehouse.app.model.Item;
 import no.eikhr.warehouse.app.session.Session;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -13,8 +15,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * Port of {@code DetailsView.fxml}/{@code DetailsViewController}. A form of
- * {@link TextField}s for the item fields, with Save ({@code putItem}, auth
- * required), Delete ({@code removeItem}, auth required) and Back.
+ * {@link TextField}s for the item fields, with Lagre ({@code putItem}, auth
+ * required), Slett ({@code removeItem}, auth required) and Tilbake.
  *
  * <p>The barcode image (barbecue) is intentionally dropped: {@code barcode} is a
  * plain text field. Dimensions/weight are not edited here but are preserved from
@@ -23,25 +25,24 @@ import javafx.scene.layout.VBox;
 public class ItemDetailView implements View {
     private static final String DEFAULT_CREATION_DATE = "2022-01-01T00:00:00.000000000";
 
-    private final VBox root = new VBox(12);
+    private final VBox root = new VBox();
 
-    private final TextField nameField = new TextField();
-    private final TextField amountField = new TextField();
-    private final TextField barcodeField = new TextField();
-    private final TextField brandField = new TextField();
-    private final TextField regularPriceField = new TextField();
-    private final TextField salePriceField = new TextField();
-    private final TextField purchasePriceField = new TextField();
-    private final TextField sectionField = new TextField();
-    private final TextField rowField = new TextField();
-    private final TextField shelfField = new TextField();
+    private final TextField nameField = Styles.input(new TextField());
+    private final TextField amountField = Styles.input(new TextField());
+    private final TextField barcodeField = Styles.input(new TextField());
+    private final TextField brandField = Styles.input(new TextField());
+    private final TextField regularPriceField = Styles.input(new TextField());
+    private final TextField salePriceField = Styles.input(new TextField());
+    private final TextField purchasePriceField = Styles.input(new TextField());
+    private final TextField sectionField = Styles.input(new TextField());
+    private final TextField rowField = Styles.input(new TextField());
+    private final TextField shelfField = Styles.input(new TextField());
 
     public ItemDetailView(Session session, AppShell shell, Item item) {
         boolean isNew = item.getId() == null;
 
-        Label heading = new Label(isNew ? "Add item" : "Edit item");
-        heading.getStyleClass().add("heading");
-        Label error = new Label();
+        Label heading = Styles.heading(isNew ? "Legg til produkt" : "Rediger produkt");
+        Label error = Styles.error("");
 
         // Populate from the item.
         nameField.setText(nz(item.getName()));
@@ -56,28 +57,29 @@ public class ItemDetailView implements View {
         shelfField.setText(nz(item.getShelf()));
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(8);
+        grid.setHgap(12);
+        grid.setVgap(10);
         int r = 0;
-        addRow(grid, r++, "Name", nameField);
-        addRow(grid, r++, "Amount", amountField);
-        addRow(grid, r++, "Barcode", barcodeField);
-        addRow(grid, r++, "Brand", brandField);
-        addRow(grid, r++, "Regular price", regularPriceField);
-        addRow(grid, r++, "Sale price", salePriceField);
-        addRow(grid, r++, "Purchase price", purchasePriceField);
-        addRow(grid, r++, "Section", sectionField);
-        addRow(grid, r++, "Row", rowField);
-        addRow(grid, r++, "Shelf", shelfField);
+        addRow(grid, r++, "Produktnavn", nameField);
+        addRow(grid, r++, "Antall", amountField);
+        addRow(grid, r++, "Strekkode", barcodeField);
+        addRow(grid, r++, "Produsent", brandField);
+        addRow(grid, r++, "Ordinær pris", regularPriceField);
+        addRow(grid, r++, "Salgspris", salePriceField);
+        addRow(grid, r++, "Innkjøpspris", purchasePriceField);
+        addRow(grid, r++, "Seksjon", sectionField);
+        addRow(grid, r++, "Rad", rowField);
+        addRow(grid, r++, "Hylle", shelfField);
+        Styles.panel(grid);
 
-        Button save = new Button("Save");
-        Button delete = new Button("Delete");
-        Button back = new Button("Back");
+        Button save = Styles.primary("Lagre");
+        Button delete = Styles.danger("Slett");
+        Button back = Styles.secondary("Tilbake");
         delete.setDisable(isNew);
 
         save.setOnAction(e -> {
-            if (!session.isLoggedIn()) { error.setText("Log in to save."); return; }
-            if (nameField.getText().trim().isEmpty()) { error.setText("Name is required."); return; }
+            if (!session.isLoggedIn()) { error.setText("Logg inn for å lagre."); return; }
+            if (nameField.getText().trim().isEmpty()) { error.setText("Produktnavn må fylles ut."); return; }
 
             int amount;
             Double regular, sale, purchase;
@@ -87,7 +89,7 @@ public class ItemDetailView implements View {
                 sale = parseDouble(salePriceField.getText());
                 purchase = parseDouble(purchasePriceField.getText());
             } catch (NumberFormatException nfe) {
-                error.setText("Amount/prices must be numbers.");
+                error.setText("Antall/priser må være tall.");
                 return;
             }
 
@@ -104,32 +106,44 @@ public class ItemDetailView implements View {
             if (item.getId() == null) item.setId(RegisterView.genId());
             if (item.getCreationDate() == null) item.setCreationDate(DEFAULT_CREATION_DATE);
 
-            error.setText("Saving…");
+            error.setText("Lagrer…");
             save.setDisable(true);
             session.server().putItem(item, session.getAuth())
-                .onFailure(err -> { save.setDisable(false); error.setText("Save failed: " + err.getMessage()); })
+                .onFailure(err -> { save.setDisable(false); error.setText("Lagring feilet: " + err.getMessage()); })
                 .onSuccess(v -> shell.show(new ItemListView(session, shell)));
         });
 
         delete.setOnAction(e -> {
-            if (!session.isLoggedIn()) { error.setText("Log in to delete."); return; }
-            if (item.getId() == null) { error.setText("Nothing to delete."); return; }
-            error.setText("Deleting…");
+            if (!session.isLoggedIn()) { error.setText("Logg inn for å slette."); return; }
+            if (item.getId() == null) { error.setText("Ingenting å slette."); return; }
+            error.setText("Sletter…");
             delete.setDisable(true);
             session.server().removeItem(item.getId(), session.getAuth())
-                .onFailure(err -> { delete.setDisable(false); error.setText("Delete failed: " + err.getMessage()); })
+                .onFailure(err -> { delete.setDisable(false); error.setText("Sletting feilet: " + err.getMessage()); })
                 .onSuccess(v -> shell.show(new ItemListView(session, shell)));
         });
 
         back.setOnAction(e -> shell.show(new ItemListView(session, shell)));
 
         HBox buttons = new HBox(10, save, delete, back);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(heading, grid, buttons, error);
+        buttons.setAlignment(Pos.CENTER_LEFT);
+
+        VBox content = new VBox(16, heading, grid, buttons, error);
+        content.setPadding(new Insets(20));
+        content.setMaxWidth(560);
+
+        VBox centerWrap = new VBox(content);
+        centerWrap.setAlignment(Pos.TOP_CENTER);
+        ScrollPane scroll = new ScrollPane(centerWrap);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: " + Styles.SCROLL_BG + ";");
+        root.getChildren().add(scroll);
+        VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
     }
 
     private static void addRow(GridPane grid, int row, String label, TextField field) {
-        grid.add(new Label(label), 0, row);
+        field.setPrefWidth(260);
+        grid.add(Styles.fieldLabel(label), 0, row);
         grid.add(field, 1, row);
     }
 

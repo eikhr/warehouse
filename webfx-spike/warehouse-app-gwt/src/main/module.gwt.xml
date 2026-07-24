@@ -88,6 +88,11 @@
     <inherits name="org.gwtproject.nio.GwtNioSupport"/>
     <!--=================================< warehouse-app >==================================-->
     <source path="no/eikhr/warehouse/app"/>
+    <source path="no/eikhr/warehouse/app/client"/>
+    <source path="no/eikhr/warehouse/app/json"/>
+    <source path="no/eikhr/warehouse/app/model"/>
+    <source path="no/eikhr/warehouse/app/session"/>
+    <source path="no/eikhr/warehouse/app/ui"/>
     <!--======================< webfx-kit-javafxcontrols-peers-base >=======================-->
     <source path="dev/webfx/kit/mapper/peers/javafxcontrols/base"/>
     <!--===================< webfx-kit-javafxcontrols-peers-elemental2 >====================-->
